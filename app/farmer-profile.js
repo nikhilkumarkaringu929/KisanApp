@@ -1,289 +1,323 @@
-// app/farmer-profile.js
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
-import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const genders = ['Male', 'Female', 'Other'];
-const soilTypes = [
-  { name: 'Black Soil', color: '#2C2C2C' },
-  { name: 'Red Soil', color: '#C0392B' },
-  { name: 'Alluvial Soil', color: '#F1C40F' },
-  { name: 'Laterite Soil', color: '#D35400' },
-];
-
-export default function FarmerProfile() {
-  const router = useRouter();
-  const [form, setForm] = useState({
-    name: '', age: '', gender: 'Male', state: 'Telangana',
-    district: '', mandal: '', village: '', landSize: '', soilType: ''
-  });
-
-  const updateForm = (key, value) => setForm({...form, [key]: value });
-
-  const saveProfile = async () => {
-    if (!form.name ||!form.landSize ||!form.soilType) {
-      alert('Name, Land Size & Soil Type required mowa');
-      return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Profile</title>
+  <style>
+    /* Global & Typography Resets */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    await AsyncStorage.setItem('userProfile', JSON.stringify(form));
-    await AsyncStorage.setItem('isOnboarded', 'true');
-    router.replace('/(tabs)');
-  };
 
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Farmer Profile</Text>
-        <Text style={styles.headerSub}>Tell us about you and your farm</Text>
-      </View>
+    body {
+      background-color: #F8FAFC;
+      color: #0F172A;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
 
-      <View style={styles.card}>
-        {/* FULL NAME - FIXED VISIBILITY */}
-        <Text style={styles.label}>FULL NAME *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your name"
-          placeholderTextColor="#94A3B8"
-          value={form.name}
-          onChangeText={(v) => updateForm('name', v)}
-        />
+    /* Container matching Mobile ScrollView layout */
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background-color: #F8FAFC;
+      padding-bottom: 40px;
+      overflow-y: auto;
+    }
 
-        <View style={styles.row}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.label}>AGE</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Years"
-              placeholderTextColor="#94A3B8"
-              keyboardType="numeric"
-              value={form.age}
-              onChangeText={(v) => updateForm('age', v)}
-            />
-          </View>
-          <View style={{ flex: 1.5 }}>
-            <Text style={styles.label}>GENDER</Text>
-            <View style={styles.genderRow}>
-              {genders.map((g) => (
-                <TouchableOpacity
-                  key={g}
-                  style={[styles.genderBtn, form.gender === g && styles.genderActive]}
-                  onPress={() => updateForm('gender', g)}
-                >
-                  <Text style={[styles.genderText, form.gender === g && styles.genderTextActive]}>
-                    {g}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </View>
+    /* Header Section */
+    .header {
+      background-color: #1B4332;
+      padding: 24px;
+      padding-top: 60px;
+      padding-bottom: 40px;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+    }
 
-        <Text style={styles.label}>STATE</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Telangana"
-          placeholderTextColor="#94A3B8"
-          value={form.state}
-          onChangeText={(v) => updateForm('state', v)}
-        />
+    .header-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
 
-        <View style={styles.row}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.label}>DISTRICT</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter district"
-              placeholderTextColor="#94A3B8"
-              value={form.district}
-              onChangeText={(v) => updateForm('district', v)}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.label}>MANDAL</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter mandal"
-              placeholderTextColor="#94A3B8"
-              value={form.mandal}
-              onChangeText={(v) => updateForm('mandal', v)}
-            />
-          </View>
-        </View>
+    .header-sub {
+      font-size: 15px;
+      color: #86EFAC;
+      margin-top: 4px;
+    }
 
-        <Text style={styles.label}>VILLAGE</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter village"
-          placeholderTextColor="#94A3B8"
-          value={form.village}
-          onChangeText={(v) => updateForm('village', v)}
-        />
+    /* Form Card Section */
+    .card {
+      background-color: #FFFFFF;
+      margin: 16px;
+      padding: 20px;
+      border-radius: 20px;
+      margin-top: -20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-        <Text style={styles.label}>LAND SIZE (ACRES) *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="e.g. 2.40"
-          placeholderTextColor="#94A3B8"
-          keyboardType="numeric"
-          value={form.landSize}
-          onChangeText={(v) => updateForm('landSize', v)}
-        />
-        <Text style={styles.note}>Note: 40 Guntas = 1 Acre</Text>
+    .label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #1E293B;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
 
-        <Text style={styles.label}>SOIL TYPE *</Text>
-        <View style={styles.soilGrid}>
-          {soilTypes.map((soil) => (
-            <TouchableOpacity
-              key={soil.name}
-              style={[styles.soilBtn, form.soilType === soil.name && styles.soilActive]}
-              onPress={() => updateForm('soilType', soil.name)}
-            >
-              <View style={[styles.dot, { backgroundColor: soil.color }]} />
-              <Text style={styles.soilText}>{soil.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+    .input {
+      width: 100%;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 16px;
+      background-color: #FFFFFF;
+      color: #0F172A;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s;
+    }
 
-        <TouchableOpacity style={styles.saveBtn} onPress={saveProfile} activeOpacity={0.8}>
-          <Text style={styles.saveBtnText}>Save & Start Farming</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
-  );
-}
+    .input:focus {
+      border-color: #22C55E;
+    }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFC'
-  },
-  header: {
-    backgroundColor: '#1B4332',
-    padding: 24,
-    paddingTop: 60,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#FFF'
-  },
-  headerSub: {
-    fontSize: 15,
-    color: '#86EFAC',
-    marginTop: 4
-  },
-  card: {
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    padding: 20,
-    borderRadius: 20,
-    marginTop: -20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 }
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#1E293B',
-    marginTop: 18,
-    marginBottom: 8,
-    letterSpacing: 0.5
-  },
-  input: {
-    borderWidth: 1.5,
-    borderColor: '#CBD5E1',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
-    color: '#0F172A', // TEXT COLOR DARK - FIX
-    fontWeight: '500'
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 12
-  },
-  genderRow: {
-    flexDirection: 'row',
-    gap: 8
-  },
-  genderBtn: {
-    flex: 1,
-    borderWidth: 2,
-    borderColor: '#22C55E',
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF'
-  },
-  genderActive: {
-    backgroundColor: '#22C55E'
-  },
-  genderText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#22C55E'
-  },
-  genderTextActive: {
-    color: '#FFFFFF'
-  },
-  note: {
-    fontSize: 12,
-    color: '#3B82F6',
-    marginTop: 6,
-    fontWeight: '600'
-  },
-  soilGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12
-  },
-  soilBtn: {
-    width: '48%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    borderWidth: 2,
-    borderColor: '#E2E8F0',
-    borderRadius: 12,
-    padding: 14,
-    backgroundColor: '#FFFFFF'
-  },
-  soilActive: {
-    borderColor: '#22C55E',
-    backgroundColor: '#F0FDF4'
-  },
-  dot: {
-    width: 18,
-    height: 18,
-    borderRadius: 9
-  },
-  soilText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1E293B'
-  },
-  saveBtn: {
-    backgroundColor: '#22C55E',
-    padding: 18,
-    borderRadius: 14,
-    marginTop: 32,
-    elevation: 3,
-    shadowColor: '#22C55E',
-    shadowOpacity: 0.3
-  },
-  saveBtnText: {
-    color: '#FFF',
-    textAlign: 'center',
-    fontWeight: '800',
-    fontSize: 17,
-    letterSpacing: 0.5
-  },
-});
+    /* Layout Elements */
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .flex-1 { flex: 1; }
+    .flex-1-5 { flex: 1.5; }
+
+    /* Gender Custom Buttons */
+    .gender-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .gender-btn {
+      flex: 1;
+      border: 2px solid #22C55E;
+      border-radius: 10px;
+      padding: 12px 0;
+      text-align: center;
+      background-color: #FFFFFF;
+      color: #22C55E;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .gender-btn.active {
+      background-color: #22C55E;
+      color: #FFFFFF;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #3B82F6;
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    /* Soil Grid Layout */
+    .soil-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .soil-btn {
+      width: calc(50% - 6px); /* 48% style simulation with strict gaps */
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 2px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 14px;
+      background-color: #FFFFFF;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .soil-btn.active {
+      border-color: #22C55E;
+      background-color: #F0FDF4;
+    }
+
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .soil-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1E293B;
+    }
+
+    /* Submission Button */
+    .save-btn {
+      width: 100%;
+      background-color: #22C55E;
+      color: #FFFFFF;
+      border: none;
+      padding: 18px;
+      border-radius: 14px;
+      margin-top: 32px;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(34, 197, 94, 0.3);
+      transition: opacity 0.2s;
+    }
+
+    .save-btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1 class="header-title">Farmer Profile</h1>
+      <p class="header-sub">Tell us about you and your farm</p>
+    </div>
+
+    <form class="card" id="profileForm" onsubmit="event.preventDefault(); saveProfile();">
+      
+      <div class="label">Full Name *</div>
+      <input type="text" id="name" class="input" placeholder="Enter your name" required>
+
+      <div class="row">
+        <div class="flex-1">
+          <div class="label">Age</div>
+          <input type="number" id="age" class="input" placeholder="Years">
+        </div>
+        <div class="flex-1-5">
+          <div class="label">Gender</div>
+          <div class="gender-row">
+            <div class="gender-btn active" onclick="selectGender('Male')">Male</div>
+            <div class="gender-btn" onclick="selectGender('Female')">Female</div>
+            <div class="gender-btn" onclick="selectGender('Other')">Other</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="label">State</div>
+      <input type="text" id="state" class="input" value="Telangana">
+
+      <div class="row">
+        <div class="flex-1">
+          <div class="label">District</div>
+          <input type="text" id="district" class="input" placeholder="Enter district">
+        </div>
+        <div class="flex-1">
+          <div class="label">Mandal</div>
+          <input type="text" id="mandal" class="input" placeholder="Enter mandal">
+        </div>
+      </div>
+
+      <div class="label">Village</div>
+      <input type="text" id="village" class="input" placeholder="Enter village">
+
+      <div class="label">Land Size (Acres) *</div>
+      <input type="number" step="0.01" id="landSize" class="input" placeholder="e.g. 2.40" required>
+      <div class="note">Note: 40 Guntas = 1 Acre</div>
+
+      <div class="label">Soil Type *</div>
+      <div class="soil-grid">
+        <div class="soil-btn" onclick="selectSoil('Black Soil')" data-soil="Black Soil">
+          <div class="dot" style="background-color: #2C2C2C;"></div>
+          <span class="soil-text">Black Soil</span>
+        </div>
+        <div class="soil-btn" onclick="selectSoil('Red Soil')" data-soil="Red Soil">
+          <div class="dot" style="background-color: #C0392B;"></div>
+          <span class="soil-text">Red Soil</span>
+        </div>
+        <div class="soil-btn" onclick="selectSoil('Alluvial Soil')" data-soil="Alluvial Soil">
+          <div class="dot" style="background-color: #F1C40F;"></div>
+          <span class="soil-text">Alluvial Soil</span>
+        </div>
+        <div class="soil-btn" onclick="selectSoil('Laterite Soil')" data-soil="Laterite Soil">
+          <div class="dot" style="background-color: #D35400;"></div>
+          <span class="soil-text">Laterite Soil</span>
+        </div>
+      </div>
+
+      <button type="submit" class="save-btn">Save & Start Farming</button>
+    </form>
+  </div>
+
+  <script>
+    // State Tracking (Simulating React's useState)
+    let formState = {
+      name: '', age: '', gender: 'Male', state: 'Telangana',
+      district: '', mandal: '', village: '', landSize: '', soilType: ''
+    };
+
+    // Initialize fields with default values
+    document.getElementById('state').value = formState.state;
+
+    // Gender Custom Select Logic
+    function selectGender(gender) {
+      formState.gender = gender;
+      document.querySelectorAll('.gender-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.innerText === gender) btn.classList.add('active');
+      });
+    }
+
+    // Soil Custom Select Logic
+    function selectSoil(soilName) {
+      formState.soilType = soilName;
+      document.querySelectorAll('.soil-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-soil') === soilName) btn.classList.add('active');
+      });
+    }
+
+    // Save Data Logic (Simulating AsyncStorage mapping to localStorage)
+    function saveProfile() {
+      // Gather inputs
+      formState.name = document.getElementById('name').value.trim();
+      formState.age = document.getElementById('age').value;
+      formState.state = document.getElementById('state').value.trim();
+      formState.district = document.getElementById('district').value.trim();
+      formState.mandal = document.getElementById('mandal').value.trim();
+      formState.village = document.getElementById('village').value.trim();
+      formState.landSize = document.getElementById('landSize').value;
+
+      // Validation check matching React Native's rule
+      if (!formState.name || !formState.landSize || !formState.soilType) {
+        alert('Name, Land Size & Soil Type required mowa');
+        return;
+      }
+
+      // Save using HTML5 localStorage API
+      localStorage.setItem('userProfile', JSON.stringify(formState));
+      localStorage.setItem('isOnboarded', 'true');
+
+      alert('Profile Saved Successfully mowa! Redirecting...');
+      // Simulated routing: window.location.href = '/tabs';
+    }
+  </script>
+</body>
+</html>
+        
